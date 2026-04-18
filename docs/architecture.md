@@ -529,9 +529,9 @@ skip_prefixes = [
 | `test_predictor.py` | 端到端推理测试：加载基线检查点，对测试样本推理，与基线结果对比 |
 | `test_checkpoint.py` | pth/safetensors 加载、DataParallel 前缀去除、权重过滤 |
 
-## 8. 待确认事项
+## 8. 已确认事项
 
 1. **mambapy vendor 许可**：mamba.py 仓库使用 MIT 协议，可自由嵌入。需在代码中保留许可声明。
-2. **是否需要支持 `IMFuse_no1skip` 变体**：当前设计仅支持 `IMFuse`（完整版），这是基线检查点对应的模型。
-3. **输出标签映射**：原仓库将 BraTS 标签 `{0,1,2,4}` 映射为 `{0,1,2,3}` 进行训练。推理输出是 `{0,1,2,3}`，是否需要在输出时反映射回 `{0,1,2,4}`？
-4. **是否需要保留原 NIfTI 文件的 affine 和 header**：当前设计中，输出 NIfTI 使用第一个输入模态的 affine/header。
+2. **不需要支持 `IMFuse_no1skip` 变体**：仅支持基线检查点对应的 `IMFuse`（完整版）。
+3. **输出标签不做映射**：BraTS 2023 已将 ET 标签值从 4 改为 3，模型输出 `{0,1,2,3}` 即为最终标签。
+4. **输出 NIfTI 使用第一个输入模态的 affine 和 header**：已确认。

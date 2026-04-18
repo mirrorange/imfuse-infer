@@ -1,17 +1,20 @@
 [project]
 name = "imfuse-infer"
 version = "0.1.0"
-description = "Add your description here"
+description = "Inference library for IM-Fuse brain tumor segmentation model"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "torch==2.10",
+    "torch>=2.0",
+    "numpy",
+    "nibabel",
 ]
 
 [project.optional-dependencies]
-mambapy = [
-    "mambapy>=1.2.0",
-]
-mamba = [
-    "mamba-ssm>=2.3.1",
-]
+cuda = ["mamba-ssm>=2.0", "causal-conv1d"]
+safetensors = ["safetensors"]
+all = ["mamba-ssm>=2.0", "causal-conv1d", "safetensors"]
+dev = ["pytest"]
+
+[project.scripts]
+imfuse-infer = "imfuse_infer.cli:main"
