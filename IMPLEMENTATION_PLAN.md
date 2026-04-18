@@ -29,7 +29,7 @@
 **Tests**:
 - Load a BraTS2023 case, preprocess, compare with npy reference
 - pth → safetensors → load → same state_dict
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 4: Predictor & Sliding Window Inference
 **Goal**: Implement IMFusePredictor with sliding window inference
