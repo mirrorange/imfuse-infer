@@ -7,7 +7,7 @@
 - Package installable with `uv pip install -e .`
 - Vendored mambapy (MambaBlock + pscan) importable
 **Tests**: `python -c "from imfuse_infer.model._vendor_mambapy.mamba import MambaBlock"`
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 2: Model Porting & Mamba Adapter
 **Goal**: Port IMFuse model and create Mamba backend adapter
@@ -19,7 +19,7 @@
 - Load checkpoint, verify no missing/unexpected keys
 - Forward pass with random input → shape (B, 4, 128, 128, 128)
 - mambapy backend matches mamba_ssm backend output (within tolerance)
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 3: IO & Preprocessing
 **Goal**: Implement NIfTI I/O and preprocessing pipeline
