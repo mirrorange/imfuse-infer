@@ -39,7 +39,7 @@
 **Tests**:
 - Run on a test case, compare segmentation output with baseline
 - Missing modality inference produces reasonable output
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 5: CLI & Final Integration
 **Goal**: CLI entry point, final tests, cleanup
