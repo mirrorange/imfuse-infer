@@ -50,4 +50,4 @@
 **Tests**:
 - CLI predict on a test case
 - CLI convert pth → safetensors
-**Status**: Not Started
+**Status**: Complete
