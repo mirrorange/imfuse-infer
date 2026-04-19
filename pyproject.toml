@@ -3,7 +3,26 @@ name = "imfuse-infer"
 version = "0.1.0"
 description = "Inference library for IM-Fuse brain tumor segmentation model"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
+authors = [
+    { name = "mirrorange", email = "niconi@foxmail.com" },
+]
+keywords = ["brain-tumor", "segmentation", "mri", "medical-imaging", "deep-learning", "mamba", "inference"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Typing :: Typed",
+]
 dependencies = [
     "torch>=2.0",
     "numpy",
@@ -16,5 +35,17 @@ safetensors = ["safetensors"]
 all = ["mamba-ssm>=2.0", "causal-conv1d", "safetensors"]
 dev = ["pytest"]
 
+[project.urls]
+Homepage = "https://github.com/mirrorange/imfuse-infer"
+Repository = "https://github.com/mirrorange/imfuse-infer"
+Issues = "https://github.com/mirrorange/imfuse-infer/issues"
+
 [project.scripts]
 imfuse-infer = "imfuse_infer.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.backends"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/imfuse_infer"]
