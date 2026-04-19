@@ -4,8 +4,16 @@ from __future__ import annotations
 
 import argparse
 import logging
+import re
 import sys
 from pathlib import Path
+
+MODALITY_PATTERNS: dict[str, tuple[str, ...]] = {
+    "flair": ("flair", "t2f"),
+    "t1ce": ("t1ce", "t1c"),
+    "t1": ("t1n", "t1"),
+    "t2": ("t2w", "t2"),
+}
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -17,6 +25,12 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # ---- predict ----
     p = sub.add_parser("predict", help="Run segmentation inference on NIfTI volumes")
+    p.add_argument(
+        "--input-dir",
+        type=str,
+        default=None,
+        help="Directory containing modality NIfTI files; filenames are matched automatically",
+    )
     p.add_argument("--flair", type=str, default=None, help="Path to FLAIR (t2f) NIfTI")
     p.add_argument("--t1ce", type=str, default=None, help="Path to T1ce (t1c) NIfTI")
     p.add_argument("--t1", type=str, default=None, help="Path to T1 (t1n) NIfTI")
@@ -40,20 +54,79 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _cmd_predict(args: argparse.Namespace) -> None:
-    from imfuse_infer.predictor import IMFusePredictor
+def _is_nifti_file(path: Path) -> bool:
+    name = path.name.lower()
+    return name.endswith(".nii") or name.endswith(".nii.gz")
 
-    input_paths: dict[str, str | None] = {
+
+def _strip_nifti_suffix(path: Path) -> str:
+    name = path.name
+    if name.lower().endswith(".nii.gz"):
+        return name[:-7]
+    if name.lower().endswith(".nii"):
+        return name[:-4]
+    return path.stem
+
+
+def _filename_matches_modality(path: Path, modality: str) -> bool:
+    stem = _strip_nifti_suffix(path).lower()
+    for token in MODALITY_PATTERNS[modality]:
+        if re.search(rf"(^|[^a-z0-9]){re.escape(token)}([^a-z0-9]|$)", stem):
+            return True
+    return False
+
+
+def _discover_input_paths(input_dir: str | Path) -> dict[str, str]:
+    directory = Path(input_dir)
+    if not directory.exists():
+        raise ValueError(f"input directory not found: {directory}")
+    if not directory.is_dir():
+        raise ValueError(f"input path is not a directory: {directory}")
+
+    nifti_files = sorted(path for path in directory.iterdir() if path.is_file() and _is_nifti_file(path))
+    discovered: dict[str, str] = {}
+
+    for modality in MODALITY_PATTERNS:
+        matches = [path for path in nifti_files if _filename_matches_modality(path, modality)]
+        if len(matches) > 1:
+            joined = ", ".join(str(path) for path in matches)
+            raise ValueError(f"multiple files matched modality '{modality}' in {directory}: {joined}")
+        if matches:
+            discovered[modality] = str(matches[0])
+
+    return discovered
+
+
+def _resolve_input_paths(args: argparse.Namespace) -> dict[str, str]:
+    input_paths: dict[str, str] = {}
+    if args.input_dir is not None:
+        input_paths.update(_discover_input_paths(args.input_dir))
+
+    explicit_paths: dict[str, str | None] = {
         "flair": args.flair,
         "t1ce": args.t1ce,
         "t1": args.t1,
         "t2": args.t2,
     }
-    # Filter out None values
-    input_paths = {k: v for k, v in input_paths.items() if v is not None}
+    input_paths.update({k: v for k, v in explicit_paths.items() if v is not None})
+    return input_paths
+
+
+def _cmd_predict(args: argparse.Namespace) -> None:
+    from imfuse_infer.predictor import IMFusePredictor
+
+    try:
+        input_paths = _resolve_input_paths(args)
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
 
     if not input_paths:
-        print("Error: at least one modality must be provided (--flair, --t1ce, --t1, --t2)", file=sys.stderr)
+        print(
+            "Error: at least one modality must be provided "
+            "(via --input-dir or --flair, --t1ce, --t1, --t2)",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     # Validate input files exist
