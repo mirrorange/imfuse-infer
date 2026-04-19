@@ -6,7 +6,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"
 authors = [
-    { name = "mirrorange", email = "niconi@foxmail.com" },
+    { name = "mirrorange", email = "orange@icedeer.net" },
 ]
 keywords = ["brain-tumor", "segmentation", "mri", "medical-imaging", "deep-learning", "mamba", "inference"]
 classifiers = [
